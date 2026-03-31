@@ -8,76 +8,110 @@ static void _vector_grow(Vector *v) {
     // deixando memória por limpar
 
     size_t new_capacity = (v->capacity == 0) ? 2 : v->capacity * 2;
-    v->data = realloc(v->data, new_capacity * sizeof(int));
+    v->data = realloc(v->data, new_capacity * v->item_size);
     v->capacity = new_capacity;
     assert(v->data);
 }
 
-void vector_init(Vector *v) {
+inline void *vector_at(const Vector *v, size_t index) {
+    assert(index <= v->size);
+    // Char = 1 byte -> permite adicionar pointers
+    return (char *)v->data + (index * v->item_size);
+}
+void vector_init(Vector *v, size_t item_size) {
     v->size = 0;
     v->capacity = 2;
-    v->data = malloc(sizeof(int) * v->capacity);
+    v->item_size = item_size;
+    v->data = malloc(item_size * v->capacity);
     assert(v->data);
 }
 
-void vector_push(Vector *v, int value) {
-    if (v->size == v->capacity) {
-        _vector_grow(v);
+void vector_get(const Vector *v, size_t index, void *out_ptr) {
+    assert(index < v->size);
+    if (out_ptr) {
+        memcpy(out_ptr, vector_at(v, index), v->item_size);
     }
-    v->data[v->size++] = value;
 }
 
-void vector_append(Vector *v, size_t index, int value) {
-    assert(v && v->data);
+void vector_push(Vector *v, const void *value_ptr) {
+    // TODO: improve error handling
+    assert(v && v->data && value_ptr);
 
     if (v->size == v->capacity) {
         _vector_grow(v);
     }
 
-    size_t elem_count = v->size - index - 1;
-    if (elem_count > 0) {
-        memmove(&v->data[index], &v->data[index + 1], elem_count * sizeof(int));
-    }
-
-    v->data[index] = value;
+    void *dest = vector_at(v, v->size);
+    memcpy(dest, value_ptr, v->item_size);
     v->size++;
 }
 
-int vector_pop(Vector *v) {
-    assert(v->size > 0);
-    // Diminui size e retoma o valor nesse index
-    return v->data[--v->size];
+void vector_append(Vector *v, size_t index, void *value_ptr) {
+    assert(v && v->data && value_ptr);
+    assert(index <= v->size);
+
+    if (v->size == v->capacity) {
+        _vector_grow(v);
+    }
+
+    size_t elem_count = v->size - index;
+    char *index_ptr = vector_at(v, index);
+
+    if (elem_count > 0) {
+        memmove(index_ptr + v->item_size, index_ptr, elem_count * v->item_size);
+    }
+    memcpy(index_ptr, value_ptr, v->item_size);
+    v->size++;
 }
 
-int vector_swap_remove(Vector *v, size_t index) {
+void vector_pop(Vector *v, void *out_ptr) {
+    assert(v->size > 0);
+    // Diminui size e retoma o valor nesse index
+    v->size--;
+    if (out_ptr) {
+        memcpy(out_ptr, vector_at(v, v->size), v->item_size);
+    }
+}
+
+void vector_swap_remove(Vector *v, size_t index, void *out_ptr) {
     // 0 <= index && index < size => 0 < size
     assert(index < v->size);
 
-    int last = v->data[--v->size];
+    v->size--;
+    void *last_ptr = vector_at(v, v->size);
+
     if (v->size > 0 && index != v->size) {
         // Se houver elementos para substituir
         // e não for para remover o último
-        int temp = v->data[index];
-        v->data[index] = last;
-        return temp;
+        void *index_ptr = vector_at(v, index);
+        if (out_ptr) {
+            memcpy(out_ptr, index_ptr, v->item_size);
+        }
+        memcpy(index_ptr, last_ptr, v->item_size);
+    } else {
+        if (out_ptr) {
+            memcpy(out_ptr, last_ptr, v->item_size);
+        }
     }
-    return last;
 }
 
-int vector_remove(Vector *v, size_t index) {
+void vector_remove(Vector *v, size_t index, void *out_ptr) {
     assert(v && v->data);
     // Verifica automaticamente que o vetor tem elementos
     assert(index < v->size);
 
-    int res = v->data[index];
+    char *index_ptr = vector_at(v, index);
 
-    size_t elem_count = v->size - index - 1;
+    if (out_ptr) {
+        memcpy(out_ptr, index_ptr, v->item_size);
+    }
+
+    size_t elem_count = v->size - index;
     if (elem_count > 0) {
-        memmove(&v->data[index], &v->data[index + 1], elem_count * sizeof(int));
+        memmove(index_ptr, index_ptr + v->item_size, elem_count * v->item_size);
     }
 
     v->size--;
-    return res;
 }
 
 void vector_free(Vector *v) {
