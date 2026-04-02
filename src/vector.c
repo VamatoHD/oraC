@@ -14,7 +14,6 @@ static void _vector_grow(Vector *v) {
 }
 
 inline void *vector_at(const Vector *v, size_t index) {
-    assert(index <= v->size);
     // Char = 1 byte -> permite adicionar pointers
     return (char *)v->data + (index * v->item_size);
 }
