@@ -89,7 +89,7 @@ char vstring_remove(VString *str, size_t index) {
 };
 
 bool vstring_equals(VString *a, VString *b) {
-    return (a->size == b->size && memcmp(a->data, b->data, a->size));
+    return (a->size == b->size && memcmp(a->data, b->data, a->size) == 0);
 };
 
 void vstring_free(VString *str) { vector_free(str); };
