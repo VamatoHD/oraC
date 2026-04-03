@@ -1,6 +1,7 @@
 #ifndef VEC_H
 #define VEC_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 typedef struct {
@@ -11,14 +12,16 @@ typedef struct {
 } Vector;
 
 // Function Prototypes
+void vector_reserve(Vector *v, size_t new_cap);
+void vector_grow(Vector *v, size_t goal);
 void vector_init(Vector *v, size_t item_size);
 void *vector_at(const Vector *v, size_t index);
-void vector_get(const Vector *v, size_t index, void *out_ptr);
+bool vector_get(const Vector *v, size_t index, void *out_ptr);
 void vector_push(Vector *v, const void *value_ptr);
-void vector_append(Vector *v, size_t index, const void *value_ptr);
-void vector_pop(Vector *v, void *out_ptr);
-void vector_swap_remove(Vector *v, size_t index, void *out_ptr);
-void vector_remove(Vector *v, size_t index, void *out_ptr);
+void vector_insert(Vector *v, size_t index, const void *value_ptr);
+bool vector_pop(Vector *v, void *out_ptr);
+bool vector_swap_remove(Vector *v, size_t index, void *out_ptr);
+bool vector_remove(Vector *v, size_t index, void *out_ptr);
 void vector_free(Vector *v);
 
 #endif

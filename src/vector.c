@@ -1,16 +1,33 @@
 #include "vector.h"
+#include "utils.h"
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-static void _vector_grow(Vector *v) {
-    // TODO: realloc pode falhar e retomar NULL
-    // deixando memória por limpar
+void vector_reserve(Vector *v, size_t new_cap) {
+    if (new_cap <= v->capacity)
+        return;
 
-    size_t new_capacity = (v->capacity == 0) ? 2 : v->capacity * 2;
-    v->data = realloc(v->data, new_capacity * v->item_size);
-    v->capacity = new_capacity;
-    assert(v->data);
+    void *temp = realloc(v->data, new_cap * v->item_size);
+    if (temp) {
+        v->data = temp;
+        v->capacity = new_cap;
+    } else {
+        // TODO: melhorar erros
+        assert(temp);
+    }
+}
+
+void vector_grow(Vector *v, size_t goal) {
+    size_t new_capacity;
+    if (goal == 0) {
+        new_capacity = (v->capacity == 0) ? 2 : strict_next_pow2(v->capacity);
+    } else {
+        new_capacity = strict_next_pow2(goal);
+    }
+
+    vector_reserve(v, new_capacity);
 }
 
 inline void *vector_at(const Vector *v, size_t index) {
@@ -25,10 +42,12 @@ void vector_init(Vector *v, size_t item_size) {
     assert(v->data);
 }
 
-void vector_get(const Vector *v, size_t index, void *out_ptr) {
-    assert(index < v->size);
-    if (out_ptr) {
+bool vector_get(const Vector *v, size_t index, void *out_ptr) {
+    if (out_ptr && index < v->size) {
         memcpy(out_ptr, vector_at(v, index), v->item_size);
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -37,7 +56,7 @@ void vector_push(Vector *v, const void *value_ptr) {
     assert(v && v->data && value_ptr);
 
     if (v->size == v->capacity) {
-        _vector_grow(v);
+        vector_grow(v, 0);
     }
 
     void *dest = vector_at(v, v->size);
@@ -45,12 +64,12 @@ void vector_push(Vector *v, const void *value_ptr) {
     v->size++;
 }
 
-void vector_append(Vector *v, size_t index, void *value_ptr) {
+void vector_insert(Vector *v, size_t index, void *value_ptr) {
     assert(v && v->data && value_ptr);
     assert(index <= v->size);
 
     if (v->size == v->capacity) {
-        _vector_grow(v);
+        vector_grow(v, 0);
     }
 
     size_t elem_count = v->size - index;
@@ -63,18 +82,26 @@ void vector_append(Vector *v, size_t index, void *value_ptr) {
     v->size++;
 }
 
-void vector_pop(Vector *v, void *out_ptr) {
-    assert(v->size > 0);
+bool vector_pop(Vector *v, void *out_ptr) {
     // Diminui size e retoma o valor nesse index
+    if (v->size == 0) {
+        return false;
+    }
+
     v->size--;
     if (out_ptr) {
         memcpy(out_ptr, vector_at(v, v->size), v->item_size);
     }
+
+    return true;
 }
 
-void vector_swap_remove(Vector *v, size_t index, void *out_ptr) {
+bool vector_swap_remove(Vector *v, size_t index, void *out_ptr) {
     // 0 <= index && index < size => 0 < size
-    assert(index < v->size);
+    // Logo não é necessário verificar vetores vazios (i hope)
+    if (index >= v->size) {
+        return false;
+    }
 
     v->size--;
     void *last_ptr = vector_at(v, v->size);
@@ -92,12 +119,16 @@ void vector_swap_remove(Vector *v, size_t index, void *out_ptr) {
             memcpy(out_ptr, last_ptr, v->item_size);
         }
     }
+    return true;
 }
 
-void vector_remove(Vector *v, size_t index, void *out_ptr) {
+bool vector_remove(Vector *v, size_t index, void *out_ptr) {
     assert(v && v->data);
+
     // Verifica automaticamente que o vetor tem elementos
-    assert(index < v->size);
+    if (index >= v->size) {
+        return false;
+    }
 
     char *index_ptr = vector_at(v, index);
 
@@ -111,6 +142,7 @@ void vector_remove(Vector *v, size_t index, void *out_ptr) {
     }
 
     v->size--;
+    return true;
 }
 
 void vector_free(Vector *v) {
