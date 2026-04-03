@@ -22,6 +22,7 @@ void vector_insert(Vector *v, size_t index, const void *value_ptr);
 bool vector_pop(Vector *v, void *out_ptr);
 bool vector_swap_remove(Vector *v, size_t index, void *out_ptr);
 bool vector_remove(Vector *v, size_t index, void *out_ptr);
+Vector vector_clone(const Vector *v);
 void vector_free(Vector *v);
 
 #endif

@@ -88,6 +88,13 @@ char vstring_remove(VString *str, size_t index) {
     }
 };
 
+VString vstring_clone(VString *str) {
+    VString new = vector_clone(str);
+    // Não deve necessitar de realocar
+    _add_terminator(&new);
+    return new;
+};
+
 bool vstring_equals(VString *a, VString *b) {
     return (a->size == b->size && memcmp(a->data, b->data, a->size) == 0);
 };

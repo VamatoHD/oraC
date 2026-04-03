@@ -145,6 +145,20 @@ bool vector_remove(Vector *v, size_t index, void *out_ptr) {
     return true;
 }
 
+Vector vector_clone(const Vector *v) {
+    Vector new;
+
+    new.size = v->size;
+    new.capacity = v->capacity;
+    new.item_size = v->item_size;
+
+    new.data = malloc(new.capacity * v->item_size);
+    if (new.data) {
+        memcpy(new.data, v->data, new.size * v->item_size);
+    }
+    return new;
+};
+
 void vector_free(Vector *v) {
     if (v->data) {
         free(v->data);

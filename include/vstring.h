@@ -15,6 +15,7 @@ void vstring_insert(VString *str, size_t index, const char c);
 char vstring_pop(VString *str);
 char vstring_remove(VString *str, size_t index);
 bool vstring_equals(VString *a, VString *b);
+VString vstring_clone(VString *str);
 void vstring_free(VString *str);
 
 //#define vstring_concat(dest, src)                                              \
