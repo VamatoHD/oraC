@@ -19,10 +19,12 @@ void *vector_at(const Vector *v, size_t index);
 bool vector_get(const Vector *v, size_t index, void *out_ptr);
 void vector_push(Vector *v, const void *value_ptr);
 void vector_insert(Vector *v, size_t index, const void *value_ptr);
+bool vector_swap(Vector *v, size_t index1, size_t index2);
 bool vector_pop(Vector *v, void *out_ptr);
 bool vector_swap_remove(Vector *v, size_t index, void *out_ptr);
 bool vector_remove(Vector *v, size_t index, void *out_ptr);
 Vector vector_clone(const Vector *v);
+void vector_sort(Vector *v, int (*cmp)(const void *, const void *));
 void vector_free(Vector *v);
 
 #endif

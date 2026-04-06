@@ -82,6 +82,31 @@ void vector_insert(Vector *v, size_t index, void *value_ptr) {
     v->size++;
 }
 
+bool vector_swap(Vector *v, size_t index1, size_t index2) {
+    if (index1 >= v->size || index2 >= v->size) {
+        return false;
+    }
+
+    if (index1 == index2) {
+        return true;
+    }
+
+    void *ptr1 = vector_at(v, index1);
+    void *ptr2 = vector_at(v, index2);
+
+    void *temp = malloc(v->item_size);
+    if (!temp) {
+        return false;
+    }
+
+    memcpy(temp, ptr1, v->item_size);
+    memcpy(ptr1, ptr2, v->item_size);
+    memcpy(ptr2, temp, v->item_size);
+
+    free(temp);
+    return true;
+};
+
 bool vector_pop(Vector *v, void *out_ptr) {
     // Diminui size e retoma o valor nesse index
     if (v->size == 0) {
@@ -158,6 +183,28 @@ Vector vector_clone(const Vector *v) {
     }
     return new;
 };
+
+void vector_sort(Vector *v, int (*cmp)(const void *, const void *)) {
+    assert(v->data);
+    if (v->size < 2)
+        return;
+
+    size_t size = v->size;
+    for (size_t i = 0; i < size - 1; i++) {
+        bool swapped = false;
+        for (size_t j = 0; j < size - i - 1; j++) {
+            void *a = vector_at(v, j);
+            void *b = vector_at(v, j + 1);
+            if (cmp(a, b) > 0) {
+                vector_swap(v, j, j + 1);
+                swapped = true;
+            }
+        }
+        if (!swapped) {
+            break;
+        }
+    }
+}
 
 void vector_free(Vector *v) {
     if (v->data) {
