@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
-project(oraC LANGUAGES C)
+project(MyMainProject LANGUAGES C)
 
-file(GLOB_RECURSE SOURCES "src/*.c")
+#Adiciona a pasta do submódulo oraC
+#Mudar dependendo da localização do submódulo
+add_subdirectory(oraC) 
 
-add_library(oraC STATIC ${SOURCES})
+#Adiciona o executável principal do projeto
+add_executable(MyApplication main.c)
 
-target_include_directories(oraC PUBLIC 
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-
-add_library(oraC::oraC ALIAS oraC)
+#Linka a biblioteca oraC
+target_link_libraries(MyApplication PRIVATE oraC::oraC)
