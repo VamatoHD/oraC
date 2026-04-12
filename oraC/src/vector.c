@@ -64,7 +64,7 @@ void vector_push(Vector *v, const void *value_ptr) {
     v->size++;
 }
 
-void vector_insert(Vector *v, size_t index, void *value_ptr) {
+void vector_insert(Vector *v, size_t index, const void *value_ptr) {
     assert(v && v->data && value_ptr);
     assert(index <= v->size);
 

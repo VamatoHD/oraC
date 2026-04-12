@@ -1,10 +1,13 @@
-#include "vector.h"
+#include "rc.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int main() {
-    Vector a;
 
-    vector_grow(&a, sizeof(int));
+    int *data = malloc(sizeof(int));
+    *data = 20;
 
-    printf("Hello");
+    Rc rc1 = rc_create(data, NULL);
+    Rc rc2 = rc_retain(&rc1);
+    Weak w1 = rc_downgrade(&rc1);
 }
