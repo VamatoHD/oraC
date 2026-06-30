@@ -1,4 +1,4 @@
-#include "rc.h"
+#include "../include/rc.h"
 #include <stdlib.h>
 
 Rc rc_create(void *data, CleanupFn cleanup) {

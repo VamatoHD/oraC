@@ -1,5 +1,5 @@
-#include "vector.h"
-#include "utils.h"
+#include "../include/vector.h"
+#include "../include/utils.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>

@@ -1,8 +1,8 @@
 #ifndef VSTRING_H
 #define VSTRING_H
 
+#include "vector.h"
 #include <stddef.h>
-#include <vector.h>
 
 typedef Vector VString;
 
@@ -18,13 +18,13 @@ bool vstring_equals(VString *a, VString *b);
 VString vstring_clone(VString *str);
 void vstring_free(VString *str);
 
-//#define vstring_concat(dest, src)                                              \
-//    _Generic((src),                                                            \
-//        const char: vstring_push,                                              \
-//        char: vstring_push,                                                    \
-//        char *: vstring_concat_cstr,                                           \
-//        const char *: vstring_concat_cstr,                                     \
-//        VString *: vstring_concat_vstring,                                     \
-//        const VString *: vstring_concat_vstring)(dest, src)
+// #define vstring_concat(dest, src) \
+//     _Generic((src), \
+//         const char: vstring_push, \
+//         char: vstring_push, \
+//         char *: vstring_concat_cstr, \
+//         const char *: vstring_concat_cstr, \
+//         VString *: vstring_concat_vstring, \ const VString *:
+//         vstring_concat_vstring)(dest, src)
 
 #endif

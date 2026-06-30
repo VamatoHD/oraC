@@ -1,4 +1,4 @@
-#include "vstring.h"
+#include "../include/vstring.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>

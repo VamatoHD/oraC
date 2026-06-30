@@ -1,4 +1,4 @@
-#include "intvector.h"
+#include "../include/intvector.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
